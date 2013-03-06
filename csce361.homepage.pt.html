@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<script src="jquery-1.9.1.js"></script>
+<script>
+
+
+
+function playComputer() {
+	document.getElementById("opponent").value="computer";
+	document.getElementById("compBtn").src="1pbs.png";
+	document.getElementById("humBtn").src="2pb.png";
+	document.getElementById("play").disabled=false;
+	document.getElementById("error").innerHTML="";
+	document.getElementById("p2").value="Computer";
+	}
+	
+
+function playHuman() {
+	document.getElementById("opponent").value="human";
+	document.getElementById("compBtn").src="1pb.png";
+	document.getElementById("humBtn").src="2pbs.png";
+	document.getElementById("play").disabled=false;
+	document.getElementById("error").innerHTML="";
+	document.getElementById("p2").value="Player2";	
+	}
+	
+
+
+</script>
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body style="background-color:gray;">
+<div align="center">
+
+<form method="GET" action="csce361.play.html">
+<table  cellspacing="0" cellpadding="0" style="border:10px solid white; background-color:white;">
+	<tr>
+		<th align="center" colspan="2"><h1><font style="color:black; font-size:60px; font-family:serif bold;">Nine Men's Morris</font></h1></th>
+	</tr>
+	<tr>
+		<td colspan="2" align="center"><INPUT  disabled="true" TYPE="submit" id="play" VALUE="" class="play"><br><br></td>
+	</tr>
+	 <tr>
+		<td colspan="2"><br/><div id="error"></div><br/></td>
+	</tr> 
+	<tr>
+		<th align="center" colspan="2">Enter your names:</th>
+	</tr>
+	<tr>
+		<td colspan="2" align="center"><input type="text" name="p1" id="p1" value="Player1"> <input type="text" name="p2" id="p2" value="Player2"></td>
+	</tr>
+	
+	<tr>
+		<td align="center" colspan="2"><br><br>
+		<img id="compBtn" onclick="playComputer()" class="b" src="1pb.png">  
+		<img id="humBtn" onload="playHuman()" class="b" src="2pb.png"><br>
+						
+								<!--Add functionality-->
+		<img class="b" src="ob.png">  <img class="b" src="rb.png"><br>
+		</td>
+		
+	</tr>
+
+<!-- <tr><td><hr></td><td><hr></td></tr> -->
+<tr>
+	<td align="center"><div id="feedback"></div></td>
+</tr>
+</table>
+<input type="hidden" id="opponent" name="opponent" value=""/>
+</form>
+</div>
+
+</body>
+</html> 

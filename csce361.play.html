@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="jquery-1.9.1.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body style="background-color:gray">
+<div align="center" id="entirepage">
+
+<!-- 
+three stages take place
+1. placing pieces (which can result in a score)
+2. moving (after all pieces have been laid players can move to valid positions)
+3. flying (after a player has gone down to 3 pieces they may fly)
+ -->
+<INPUT type="hidden" id="stage" value="1"/>
+
+<!-- 
+1=original player
+2=human or computer
+ -->
+<INPUT type="hidden" id="turn"  value="1"/>
+
+<!--
+last position clicked
+(used for moving and flying stages) 
+-->
+<INPUT type="hidden" id="last"  value="0"/>
+
+<!--
+action requested by last instance 
+-->
+<INPUT type="hidden" id="action"  value="nothing"/>
+
+<!-- used to store the previously clicked vertices -->
+<input type="hidden" id="vertex" value=""/>
+<!-- used to store player1's previously clicked vertices -->
+<input type="hidden" id="player1_vertex"/>
+<!-- used to store player2's previously clicked vertices -->
+<input type="hidden" id="player2_vertex"/>
+
+
+
+<h1 class="title" ><font style="color:white; font-size:60px; font-family:verdana;">Nine Men's Morris</font></h1>
+<table border="1" width="680">
+<tr>
+	<td id="1playernm" align="center" width="100"  bgcolor="#D16587"><div id="name"></div></td>
+	<td align="center" rowspan="2">
+	
+<table class="board" style="background-image:url('boardf.png'); background-color:white;" bgcolor="#fff" height="490" width="490" cellpadding="0" cellspacing="0">
+	<tr>
+		<td class="circle"><img id="00" class="top" onclick="clicked('00');" src="lay.png"/></td>
+		<td></td>
+		<td></td>
+		<td class="circle"><img id="03" class="top" onclick="clicked('03');" src="lay.png"/></td>
+		<td></td>
+		<td></td>
+		<td class="circle"><img id="06" class="top" onclick="clicked('06');"  src="lay.png"/></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td class="circle"><img id="11" class="top" onclick="clicked('11');"  src="lay.png"></td>
+		<td></td>
+		<td class="circle"><img id="13" class="top" onclick="clicked('13');"  src="lay.png"></td>
+		<td></td>
+		<td class="circle"><img id="15" class="top" onclick="clicked('15');"  src="lay.png"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+		<td class="circle"><img id="22" class="top" onclick="clicked('22');"  src="lay.png"></td>
+		<td class="circle"><img id="23" class="top" onclick="clicked('23');"  src="lay.png"></td>
+		<td class="circle"><img id="24" class="top" onclick="clicked('24');"  src="lay.png"></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="circle"><img id="30" class="top" onclick="clicked('30');"  src="lay.png"></td>
+		<td class="circle"><img id="31" class="top" onclick="clicked('31');"  src="lay.png"></td>
+		<td class="circle"><img id="32" class="top" onclick="clicked('32');"  src="lay.png"></td>
+		<td></td>
+		<td class="circle"><img id="34" class="top" onclick="clicked('34');"  src="lay.png"></td>
+		<td class="circle"><img id="35" class="top" onclick="clicked('35');"  src="lay.png"></td>
+		<td class="circle"><img id="36" class="top" onclick="clicked('36');"  src="lay.png"></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+		<td class="circle"><img id="42" class="top" onclick="clicked('42');"  src="lay.png"></td>
+		<td class="circle"><img id="43" class="top" onclick="clicked('43');"  src="lay.png"></td>
+		<td class="circle"><img id="44" class="top" onclick="clicked('44');"  src="lay.png"></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td class="circle"><img id="51" class="top" onclick="clicked('51');"  src="lay.png"></td>
+		<td></td>
+		<td class="circle"><img id="53" class="top" onclick="clicked('53');"   src="lay.png"></td>
+		<td></td>
+		<td class="circle"><img id="55" class="top" onclick="clicked('55');"  src="lay.png"></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td class="circle"><img id="60" class="top" onclick="clicked('60');"  src="lay.png"></td>
+		<td></td>
+		<td></td>
+		<td class="circle"><img id="63" class="top" onclick="clicked('63');"  src="lay.png"></td>
+		<td></td>
+		<td></td>
+		<td class="circle"><img id="66" class="top" onclick="clicked('66');"  src="lay.png"></td>
+	</tr>
+</table>
+	</td>
+	<td id="2playernm" align="center" width="100" bgcolor="lightblue"><div id="opName"></div></td>
+</tr>
+<tr>
+	<td id="1playerpc" align="center" bgcolor="red">
+		<input type="hidden"  id="user_piecesLeft" value="9"/>
+			<table>
+				<tr><td><img id="p19" class="top" src="red.png"></td></tr>
+				<tr><td><img id="p18" class="top" src="red.png"></td></tr>
+				<tr><td><img id="p17" class="top"  src="red.png"></td></tr>
+				<tr><td><img id="p16" class="top"  src="red.png"></td></tr>
+				<tr><td><img id="p15" class="top"  src="red.png"></td></tr>
+				<tr><td><img id="p14" class="top" src="red.png"></td></tr>
+				<tr><td><img id="p13" class="top" src="red.png"></td></tr>
+				<tr><td><img id="p12" class="top" src="red.png"></td></tr>
+				<tr><td><img id="p11" class="top"  src="red.png"></td></tr>
+			</table>
+	</td>
+	<td id="2playerpc" align="center" style="opacity: 0.30000000000000004;" bgcolor="blue">
+		<input type="hidden" id="opp_piecesLeft"value="9"/>
+			<table>
+				<tr><td><img id="p29" class="top"  src="blue.png"></td></tr>
+				<tr><td><img id="p28" class="top" src="blue.png"></td></tr>
+				<tr><td><img id="p27" class="top" src="blue.png"></td></tr>
+				<tr><td><img id="p26" class="top" src="blue.png"></td></tr>
+				<tr><td><img id="p25" class="top"  src="blue.png"></td></tr>
+				<tr><td><img id="p24" class="top"  src="blue.png"></td></tr>
+				<tr><td><img id="p23" class="top"  src="blue.png"></td></tr>
+				<tr><td><img id="p22" class="top"  src="blue.png"></td></tr>
+				<tr><td><img id="p21" class="top"  src="blue.png"></td></tr>
+			</table>
+	</td>
+</tr>
+</table>
+<p id="error_out" class="message"></p>
+</div>
+
+<input type="hidden" id="player1pcleft" value="9"/>
+
+<input type="hidden" id="player2pcleft" value="9"/>
+
+<INPUT type="hidden" id="opponent"/>
+<script type="text/javascript">
+//IN ORDER TO FINISH PHASE 1:
+//CAN'T ALLOW PLAYERS TO REMOVE OPPONENTS
+//POSITION IF ITS A MILL, IF ALL ARE MILLS, REMOVE ANYWAY0
+
+
+//global
+var OP_TYPE;
+var OP_NAME;
+var NAME;
+var TURN;
+
+//mill lists
+var MILS = new Array();
+MILS[0]="00.03.06";
+MILS[1]="11.13.15";
+MILS[2]="22.23.24";
+MILS[3]="30.31.32";
+MILS[14]="34.35.36";
+MILS[4]="42.43.44";
+MILS[5]="51.53.55";
+MILS[6]="60.63.66";
+MILS[7]="00.30.60";
+MILS[8]="11.31.51";
+MILS[9]="22.32.42";
+MILS[10]="03.13.23";
+MILS[11]="43.53.63";
+MILS[12]="24.34.44";
+MILS[13]="15.35.55";
+MILS[15]="06.36.66";
+
+//Takes url string and sets values
+var locate = window.location
+document.getElementById("opponent").value = locate
+var text = document.getElementById("opponent").value
+if(text.indexOf("?")!=-1)
+{
+	delineate(text);
+}
+else
+{
+//If this page is accessed before the home page an error will bomb
+	document.getElementById("entirepage").innerHTML="An error has occured. please go to the <a href='../csce361.homepage.pt.html'>home page</a> to start over";
+	exit(0);
+}
+document.getElementById("name").innerHTML=NAME;
+document.getElementById("opName").innerHTML=OP_NAME;
+
+//******************FUNCTIONS*******************//
+//sets global constants
+function delineate(str)
+{
+var x = str.split("&");
+
+var y= x[x.length-1].split("=");
+OP_TYPE=y[1];
+
+y=x[x.length-2].split("=");
+OP_NAME=y[1];
+
+y=x[x.length-3].split("=");
+NAME=y[1];
+}
+
+function clicked(rowcolumn)
+{
+//var position=rowcolumn.split("");
+//var row=position[0];
+//var column=position[1];
+var stage = $("#stage").val();
+var turn = $("#turn").val();
+var last = $("#last").val();
+var action = $("#action").val();
+
+//PLACING STAGE
+if(stage==1)
+{
+//document.getElementById("entirepage").innerHTML=document.getElementById(rowcolumn).src
+	var piecesleft = placing(rowcolumn,turn,action);
+	if(piecesleft==0)
+	{
+		setHiddenElement("stage","2");
+	}
+}
+//MOVING STAGE
+else if(stage==2)
+{
+	moving(rowcolumn,turn,action);
+}
+//FLYING STAGE
+else if(stage==3)
+{
+
+}
+
+}
+
+//function for stage one
+function placing(rowcolumn, turn,action)
+{
+var totalpiecesleft =0;
+
+var element = $("#" + rowcolumn);
+
+//if a mil was created last click
+if(action=="remove")
+{
+	removePiece(turn,1,rowcolumn);
+	return;
+}
+
+if (turn=="1")
+{//if user turn
+
+	//get number of pieces left
+	var pieces = document.getElementById("user_piecesLeft").value;
+	pieces=parseInt(pieces,10);
+	
+	
+	
+	if(pieces>0)
+	{
+		
+		if(!alreadyClicked(rowcolumn))
+		{
+		//	add this vertex to the already clicked array
+			addPosition(rowcolumn);
+			alterClickedPosition(rowcolumn,1,2);//add to player's vertex
+			pieces--;
+			document.getElementById("user_piecesLeft").value=pieces;
+		// *********************************************
+			
+			element.hide();
+			element.attr("src","red.png");
+			element.fadeIn("500");
+			
+			
+			pieces++;
+			$("#p"+turn+pieces).fadeOut("500");
+			
+			
+			if(!milCreated(rowcolumn,1))
+			{
+				
+				document.getElementById("turn").value="2";
+				
+				
+				//document.getElementById("1playernm").style.backgroundColor="white";
+				//document.getElementById("1playerpc").style.backgroundColor="white";
+				document.getElementById("2playernm").style.backgroundColor="lightblue";
+				document.getElementById("2playerpc").style.backgroundColor="blue";
+				$("#1playernm").animate({opacity:'0.3'},"500");
+				$("#1playerpc").animate({opacity:'0.3'},"500",function(){
+				$("#2playernm").animate({opacity:'0.9'},"500");
+				$("#2playerpc").animate({opacity:'0.9'},"500");
+				});
+				
+				clearerror();
+			}
+			else
+			{
+				errorout("A mill was created, please select an opponent's piece to remove");
+				document.getElementById("action").value="remove";
+				//removePiece(1,1);
+				
+				
+			}
+		
+			
+		}
+		else
+		{ 
+			errorout("Please select a valid position");
+		} //error message for valid position
+		
+	}
+}
+else
+{//opponent's turn
+	var pieces = document.getElementById("opp_piecesLeft").value
+	pieces=parseInt(pieces,10);
+	if(pieces>0)
+	{ 
+		if(!alreadyClicked(rowcolumn))
+		{
+		//	add this vertex to the already clicked string
+		
+			addPosition(rowcolumn);
+			alterClickedPosition(rowcolumn,2,2);//add to player's vertex
+			pieces--;
+			document.getElementById("opp_piecesLeft").value=pieces;
+		// ****************************************************
+		
+			pieces++;
+			$("#p"+turn+pieces).fadeOut("500");
+			
+			element.hide();
+			element.attr("src","blue.png");
+			element.fadeIn("500");
+			
+			if(!milCreated(rowcolumn,2))
+			{
+				
+				document.getElementById("turn").value="1";
+				document.getElementById("1playernm").style.backgroundColor="#D16587";
+				document.getElementById("1playerpc").style.backgroundColor="red";
+				//document.getElementById("2playernm").style.backgroundColor="white";
+				//document.getElementById("2playerpc").style.backgroundColor="white";
+				
+				$("#2playernm").animate({opacity:'0.3'},"500");
+				$("#2playerpc").animate({opacity:'0.3'},"500",function(){
+				$("#1playernm").animate({opacity:'0.9'},"500");
+				$("#1playerpc").animate({opacity:'0.9'},"500");
+				});
+				clearerror();
+			}
+			else
+			{
+				errorout("A mill was created, please select an opponent's piece to remove");
+				document.getElementById("action").value="remove";
+				//removePiece(2,1)
+				
+			}
+			
+		}
+		else
+		{
+			
+			errorout("Please select a valid position");
+		}
+	}
+}
+var player1piecesleft = document.getElementById("user_piecesLeft").value;
+var player2piecesleft = document.getElementById("opp_piecesLeft").value;
+player1piecesleft=parseInt(player1piecesleft,10);
+player2piecesleft=parseInt(player2piecesleft,10);
+totalpiecesleft = player1piecesleft + player2piecesleft;
+
+if(getHiddenElement("action")!="remove")
+{
+	return totalpiecesleft;
+}
+else
+{
+	return 1;
+}
+}
+
+//function for stage two
+function moving(rowcolumn, turn, action)
+{
+var element = $("#"+rowcolumn);
+var lastPosition = getHiddenElement("last");
+var lastrowcolumn = lastPosition.val();
+
+//if a mil was created last click
+if(action=="remove")
+{
+	removePiece(turn,2,rowcolumn);
+	stage2done();
+	return;
+}
+
+
+//if player1's move
+if(turn==1)
+{
+	if(lastPosition.val().indexOf(rowcolumn)==-1)//if player didn't click on same piece again
+	{	
+		if((alterClickedPosition(rowcolumn,1,1)&&(action=="nothing"))||(!alreadyClicked(rowcolumn)&&(action=="second_spot")&&isAdjacent(lastrowcolumn,rowcolumn)))
+		{ //make sure player owns piece if clicking on requested piece to move (OR) no pieces exist where player requests to move piece
+			
+			
+			if(action=="nothing")
+			{
+			element.animate({height:'60px',width:'60px'},"500");//make clicked piece bigger
+			setHiddenElement("last",rowcolumn);//set the last clicked element
+			setHiddenElement("action","second_spot");//set action to second_spot
+			clearerror();
+			}
+			else if(action=="second_spot")//clicking second position
+			{	
+				
+				alterClickedPosition(lastrowcolumn,1,3)//delete previous position 
+				alterClickedPosition(rowcolumn,1,2);//add new position 
+				addPosition(rowcolumn);//adds global position
+				element.hide();
+				element.attr("src","red.png");
+				element.fadeIn("500");
+				
+				var milmade = milCreated(rowcolumn,1);
+				
+				if(!milmade){//no mill was created, allow for next player's move
+					$("#1playernm").animate({opacity:'0.3'},"500");
+					$("#1playerpc").animate({opacity:'0.3'},"500",function(){
+					$("#2playernm").animate({opacity:'0.9'},"500");
+					$("#2playerpc").animate({opacity:'0.9'},"500");
+					})
+					setHiddenElement("action","nothing");
+					setHiddenElement("last","");
+					setHiddenElement("turn","2");
+					clearerror();
+					lastPosition.animate({height:'45px',width:'45px'},"500");
+					lastPosition.removeAttr("style");
+					element.animate({height:'45px',width:'45px'},"500");
+					element.removeAttr("style");
+				}
+				else//mill was created allow removal of valid piece
+				{
+					errorout("A mill was created, please select an opponent's piece to remove");
+					setHiddenElement("action","remove");
+					lastPosition.animate({height:'45px',width:'45px'},"500");
+					lastPosition.removeAttr("style");
+					element.animate({height:'45px',width:'45px'},"500");
+					element.removeAttr("style");
+				}
+			}
+			
+		}
+		else
+		{
+		errorout("Please select a valid position");
+		}
+	}
+	else//re-clicking on the piece to click on a different location instead
+	{
+		setHiddenElement("action","nothing");
+		setHiddenElement("last","");
+		lastPosition.animate({height:'45px',width:'45px'},"500");
+		lastPosition.removeAttr("style");
+		element.animate({height:'45px',width:'45px'},"500");
+		element.removeAttr("style");
+		clearerror();
+	}
+}
+else//player2's move
+{
+	if(lastPosition.val().indexOf(rowcolumn)==-1)//if player didn't click on same piece again
+	{	
+		if((alterClickedPosition(rowcolumn,2,1)&&(action=="nothing"))||(!alreadyClicked(rowcolumn)&&(action=="second_spot")&&isAdjacent(lastrowcolumn,rowcolumn)))
+		{ //make sure player owns piece if clicking on requested piece to move (OR) no pieces exist where player requests to move piece
+			
+			
+			if(action=="nothing")
+			{
+			element.animate({height:'60px',width:'60px'},"500");//make clicked piece bigger
+			setHiddenElement("last",rowcolumn);//set the last clicked element
+			setHiddenElement("action","second_spot");//set action to second_spot
+			clearerror();
+			}
+			else if(action=="second_spot")//clicking second position
+			{	
+				
+				alterClickedPosition(lastrowcolumn,2,3)//delete previous position 
+				alterClickedPosition(rowcolumn,2,2);//add new position 
+				addPosition(rowcolumn);//adds global position
+				element.hide();
+				element.attr("src","blue.png");
+				element.fadeIn("500");
+				
+				var milmade = milCreated(rowcolumn,2);
+				
+				if(!milmade){//no mill was created, allow for next player's move
+					
+					$("#2playernm").animate({opacity:'0.3'},"500");
+					$("#2playerpc").animate({opacity:'0.3'},"500",function(){
+					$("#1playernm").animate({opacity:'0.9'},"500");
+					$("#1playerpc").animate({opacity:'0.9'},"500");
+					});
+					setHiddenElement("action","nothing");
+					setHiddenElement("last","");
+					setHiddenElement("turn","1");
+					clearerror();
+					lastPosition.animate({height:'45px',width:'45px'},"500");
+					lastPosition.removeAttr("style");
+					element.animate({height:'45px',width:'45px'},"500");
+					element.removeAttr("style");
+				}
+				else//mill was created allow removal of valid piece
+				{
+					errorout("A mill was created, please select an opponent's piece to remove");
+					setHiddenElement("action","remove");
+					lastPosition.animate({height:'45px',width:'45px'},"500");
+					lastPosition.removeAttr("style");
+					element.animate({height:'45px',width:'45px'},"500");
+					element.removeAttr("style");
+				}
+			}
+			
+		}
+		else
+		{
+		errorout("Please select a valid position");
+		}
+	}
+	else//re-clicking on the piece to click on a different location instead
+	{
+		setHiddenElement("action","nothing");
+		setHiddenElement("last","");
+		
+		clearerror();
+		lastPosition.animate({height:'45px',width:'45px'},"500");
+		lastPosition.removeAttr("style");
+		element.animate({height:'45px',width:'45px'},"500");
+		element.removeAttr("style");
+	}
+}
+	
+stage2done();
+	
+}
+//check for completion of stage 2
+function stage2done()
+{
+//check if a player has won
+var pcsLeftForPlayer1 = $("#player1pcleft").val();
+var pcsLeftForPlayer2 = $("#player2pcleft").val();
+if(pcsLeftForPlayer1 <=2)
+{
+	endGame(2);
+}
+if(pcsLeftForPlayer2 <=2)
+{
+	endGame(1);
+}
+}
+//boolean return; checks to see if the requested position is adjacent to the last clicked position
+function isAdjacent(lastrowcolumn,newrowcolumn)
+{
+var arrAdj= "";
+
+
+for(var k=0;k<16;k++)
+{
+	var temparr = MILS[k]
+	
+	//get mill that contains the newly placed piece
+	if(temparr.indexOf(lastrowcolumn)!=-1)
+	{
+		arrAdj += "." +MILS[k]+".";
+	}
+}
+
+arrAdj = arrAdj.split(".");
+for(var j=0;j<arrAdj.length;j++)
+{
+	if(arrAdj[j]==newrowcolumn)
+	{
+	return true;
+	}
+}
+return false
+}
+
+//boolean return; checks to see if the given position has been clicked already
+function alreadyClicked(position)
+{
+	var i;
+	
+	var vertex = document.getElementById("vertex").value;
+	vertex=vertex.split(".");
+	var len=vertex.length;
+	for(i=0;i<len;i++)
+	{
+		if(vertex[i]==position){return true;}
+	}
+return false;
+}
+
+//add position to global positions
+function addPosition(rowcolumn)
+{
+	var vertex = document.getElementById("vertex").value;
+	vertex +="."+rowcolumn+".";
+	vertex = vertex.replace("..",".");
+	document.getElementById("vertex").value=vertex;
+}
+
+//fucntion searches,adds,deletes clicked positions
+//1=search;2=add;3=delete;4=retun selected vertexs
+function alterClickedPosition(rowcolumn,player,action)
+{
+	var element = $("#" + rowcolumn);
+	var position
+	if(player==1)
+		{position="player1_vertex";}
+	else
+		{position="player2_vertex";}
+	var player_vertex = document.getElementById(position).value;
+
+	if(action==1)
+	{//search vertex (return all vertexs?, or just return true upon finding?)
+		if(player_vertex.indexOf(rowcolumn)!=-1){return true;}else{return false;}
+	}
+	else if(action==2)
+	{//add vertex 
+		player_vertex +="."+rowcolumn+".";
+		player_vertex = player_vertex.replace("..",".");
+		document.getElementById(position).value=player_vertex;
+		
+		//Add vertex to global position string
+		//addPosition(rowcolumn);
+	}
+	else if(action==3)
+	{//delete vertex
+		player_vertex=player_vertex.replace(rowcolumn,"");
+		player_vertex = player_vertex.replace("..",".");
+		document.getElementById(position).value=player_vertex;
+		
+		//fadeout->change source->change css.display
+		element.fadeOut("500",function(){element.attr("src","lay.png");element.css("display","inline");});
+		
+		
+		//remove vertex from global position string
+		var vertex = document.getElementById("vertex").value;
+		vertex=vertex.replace(rowcolumn,"");
+		vertex=vertex.replace("..",".");
+		document.getElementById("vertex").value =vertex;
+	}
+	else if(action==4)
+	{//returns selected vertexs
+		return player_vertex;
+	}
+}
+
+//function that checks to see if the piece that is about to be removed, can be removed (i.e. if it 
+//is a part of a mill or not, if no other options, allow removal
+function canItBeRemoved(rowcolumn,player)
+{
+	//will grab all the previously clicked positions and see if any are not a part of a mill, 
+	//if one exists, the rowcolumn clicked must be one of those.
+	var vertex=alterClickedPosition(rowcolumn,player,4);
+	var vertex =vertex.replace("..",".");
+	var vertex=vertex.split(".");
+	var temparr=""
+		
+	for(var i=0;i<vertex.length;i++)
+	{   //if a piece doesn't create mill add it to an array
+		if(vertex[i]!="")
+		{
+			if(!milCreated(vertex[i],player))
+			{
+				temparr+="."+vertex[i]+".";
+			}
+		}
+	}
+	
+	if(temparr.length>0)
+	{
+	//if the requested piece is within the array allow removal
+		if(temparr.indexOf(rowcolumn)!=-1)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else //no non-mill pieces exist, allow removal.
+	{
+		return true;
+	}
+	
+	
+}
+
+//function that returns a boolean to the condition of  whether or not a mil was created
+function milCreated(rowcolumn,player)
+{
+var vertex = alterClickedPosition(rowcolumn,player,4);
+vertex=vertex.split(".");
+var temp;
+var three;
+var len=vertex.length
+
+//Jankety way of determining if a mil was made
+//could easily be improved with (indexOf(.xx.)!=-1)
+for(var k=0;k<16;k++)
+{
+	if(MILS[k].indexOf(rowcolumn)!=-1)
+	{
+		for(i=0;i<MILS.length;i++)
+		{
+			three=0;
+			temp=MILS[k].split(".");
+			for(var j=0;j<len;j++)
+			{
+				if(vertex[j] !="")
+				{
+					if((vertex[j]==temp[0])||(vertex[j]==temp[1])||(vertex[j]==temp[2]))
+					{
+						three++;
+						if(three==3)
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}	
+}
+
+return false;
+}
+
+//POSSIBLY BETTER VERSION OF MILCREATED ALGO
+{
+/*
+function milCreated(rowcolumn,player)
+{
+var vertex = alterClickedPosition(rowcolumn,player,4);
+var temp =0;
+//vertex = vertex.substring(0,vertex.length-1);
+//vertex = vertex.substring(1);
+//vertex = vertex.split(".");
+
+for(var k=0;k<16;k++)
+{
+	var temparr = MILS[k]
+	temp=0;
+	//get mill that contains the newly placed piece
+	if(temparr.indexOf(rowcolumn)!=-1)
+	{
+		temparr=temparr.substring(0,temparr.length-1);
+		temparr=temparr.substring(1);
+		temparr=temparr.split(".");
+		for(var i=0;i<temparr.length;i++)
+		{
+			if(vertex.indexOf(temparr[i])!=-1)
+			{
+			temp++;
+			}
+		}
+		if(temp==3)
+		{
+		//if mill is contained within the 
+		return true;
+		}
+	}
+}
+return false;
+}*/
+}
+
+//FOR REMOVING PIECES AFTER A MILL IS CREATED
+//removes piece based off of the player and stage
+function removePiece(player,stage,rowcolumn)
+{
+player1pcleft
+var pcleft = $("#player"+player+"pcleft").val();
+
+if(player==1)
+{
+	if(alterClickedPosition(rowcolumn,2,1))//if the piece exists 
+	{
+		if(canItBeRemoved(rowcolumn,2))//if the piece can be removed (i.e. not a part of a mill or no other choice but a mill)
+		{
+			alterClickedPosition(rowcolumn,2,3);//delete piece
+			document.getElementById("turn").value="2";
+			//document.getElementById("1playernm").style.backgroundColor="white";
+			//document.getElementById("1playerpc").style.backgroundColor="white";
+			//document.getElementById("2playernm").style.backgroundColor="blue";
+			//document.getElementById("2playerpc").style.backgroundColor="blue";
+			$("#1playernm").animate({opacity:'0.3'},"500");
+			$("#1playerpc").animate({opacity:'0.3'},"500");
+			$("#2playernm").animate({opacity:'0.9'},"500");
+			$("#2playerpc").animate({opacity:'0.9'},"500");
+			clearerror();
+			document.getElementById("action").value="nothing";
+			setHiddenElement("last","");
+			//decrement remaining pieces left on board
+			pcleft--;
+			$("#player"+player+"pcleft").val(pcleft);
+		}
+		else
+		{
+			errorout("Please select a piece that isn't within a mill");
+		}
+	}
+	else
+	{
+		errorout("Please select an opponent's piece");
+		
+	}
+	
+	
+}
+else
+{
+	if(alterClickedPosition(rowcolumn,1,1))//if the piece exists
+	{
+		if(canItBeRemoved(rowcolumn,1))
+		{
+			alterClickedPosition(rowcolumn,1,3);//delete piece
+			document.getElementById("turn").value="1";
+			
+			//document.getElementById("1playernm").style.backgroundColor="#D16587";
+			//document.getElementById("1playerpc").style.backgroundColor="red";
+			//document.getElementById("2playernm").style.backgroundColor="white";
+			//document.getElementById("2playerpc").style.backgroundColor="white";
+			$("#1playernm").animate({opacity:'0.9'},"500");
+			$("#1playerpc").animate({opacity:'0.9'},"500");
+			$("#2playernm").animate({opacity:'0.3'},"500");
+			$("#2playerpc").animate({opacity:'0.3'},"500");
+			clearerror();
+			document.getElementById("action").value="nothing";
+			setHiddenElement("last","");
+			//decrement remaining pieces left for player
+			pcleft--;
+			$("#player"+player+"pcleft").val(pcleft);
+		}
+		else
+		{
+			errorout("Please select a piece that isn't within a mill");
+		}
+	}
+	else
+	{
+		errorout("Please select an opponent's piece");
+	}
+
+}
+}
+//end game routine
+function endGame(player_won)
+{
+	alert(getPlayerName(player_won) + " has won the game!");
+}
+//send out error/message
+function errorout(message)
+{
+
+var element = $("#error_out");
+element.hide(function(){
+//element.removeAttr("style");
+//element.css("display","");
+element.fadeIn("500");
+element.html(message);
+//callback function
+
+});
+
+
+}
+
+function clearerror()
+{
+var element = $("#error_out");
+element.fadeOut("500",function(){element.html("");});
+
+
+
+
+}
+
+function setHiddenElement(variable,message)
+{
+var element = $("#" + variable);
+element.val(message);
+}
+
+function getHiddenElement(variable)
+{
+return $("#"+variable);
+}
+function getPlayerName(player)
+{
+if(player==1)
+{
+	return NAME;
+}
+else
+{
+	return OP_NAME;
+}
+}
+//document.getElementById("entirepage").innerHTML=OP_TYPE+"&&"+OP_NAME+"&&"+NAME;
+</script>
+
+
+</body>
+</html> 
