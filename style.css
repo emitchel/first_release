@@ -1,0 +1,71 @@
+body 
+{
+    font-family:Arial;
+    font-size:14px;
+}
+
+.board td {
+	height:65px; 
+	width:70px;
+	align:center;
+	text-align:center;
+	border:2px solid transparent;
+	// border:2px solid black; !important
+	padding: 0;
+}
+
+.board table {
+	border:1px solid black;
+	border-collapse: collapse;
+}
+
+.play {
+	border:none;
+	height:155px;
+	width:155px;
+	background: url('play.png') no-repeat top left;
+}
+
+.play[disabled]:hover, .play[disabled] {
+	opacity:0.3;
+	filter:alpha(opacity=30);
+}
+
+.b:hover, .play:hover {
+	opacity:0.8;
+	filter:alpha(opacity=80);
+}
+
+#p1, #p2 {
+	background-color:#c0d4e0;
+	border:1px solid black;
+	height:30px;
+	width:170px;
+	text-align:center;
+}
+
+
+.circle:hover{
+	// border:2px solid green;
+	background:transparent url('hov.png') no-repeat; 
+}
+
+
+.top{
+	width:45px;
+	height:45px;
+}
+#mask{ 
+	position:absolute;
+	top:0px;
+	left:0px;
+	height:100%;
+	width:100%;
+	display:none;     
+	background-color: black;
+}
+    
+#modal_window{
+	position:absolute;
+	display:none;
+}
